@@ -660,7 +660,7 @@
           }
         }
       },
-      "Microsoft.OpenApi/2.4.1": {
+      "Microsoft.OpenApi/2.3.0": {
         "type": "package",
         "compile": {
           "lib/net8.0/Microsoft.OpenApi.dll": {
@@ -854,13 +854,13 @@
           "lib/net6.0/SQLitePCLRaw.provider.e_sqlite3.dll": {}
         }
       },
-      "Swashbuckle.AspNetCore/10.1.7": {
+      "Swashbuckle.AspNetCore/10.0.0": {
         "type": "package",
         "dependencies": {
           "Microsoft.Extensions.ApiDescription.Server": "10.0.0",
-          "Swashbuckle.AspNetCore.Swagger": "10.1.7",
-          "Swashbuckle.AspNetCore.SwaggerGen": "10.1.7",
-          "Swashbuckle.AspNetCore.SwaggerUI": "10.1.7"
+          "Swashbuckle.AspNetCore.Swagger": "10.0.0",
+          "Swashbuckle.AspNetCore.SwaggerGen": "10.0.0",
+          "Swashbuckle.AspNetCore.SwaggerUI": "10.0.0"
         },
         "build": {
           "build/Swashbuckle.AspNetCore.props": {}
@@ -869,10 +869,10 @@
           "buildMultiTargeting/Swashbuckle.AspNetCore.props": {}
         }
       },
-      "Swashbuckle.AspNetCore.Swagger/10.1.7": {
+      "Swashbuckle.AspNetCore.Swagger/10.0.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.OpenApi": "2.4.1"
+          "Microsoft.OpenApi": "2.3.0"
         },
         "compile": {
           "lib/net10.0/Swashbuckle.AspNetCore.Swagger.dll": {
@@ -888,10 +888,10 @@
           "Microsoft.AspNetCore.App"
         ]
       },
-      "Swashbuckle.AspNetCore.SwaggerGen/10.1.7": {
+      "Swashbuckle.AspNetCore.SwaggerGen/10.0.0": {
         "type": "package",
         "dependencies": {
-          "Swashbuckle.AspNetCore.Swagger": "10.1.7"
+          "Swashbuckle.AspNetCore.Swagger": "10.0.0"
         },
         "compile": {
           "lib/net10.0/Swashbuckle.AspNetCore.SwaggerGen.dll": {
@@ -904,7 +904,7 @@
           }
         }
       },
-      "Swashbuckle.AspNetCore.SwaggerUI/10.1.7": {
+      "Swashbuckle.AspNetCore.SwaggerUI/10.0.0": {
         "type": "package",
         "compile": {
           "lib/net10.0/Swashbuckle.AspNetCore.SwaggerUI.dll": {
@@ -2790,10 +2790,10 @@
         "microsoft.identitymodel.tokens.nuspec"
       ]
     },
-    "Microsoft.OpenApi/2.4.1": {
-      "sha512": "u7QhXCISMQuab3flasb1hoaiERmUqyWsW7tmQODyILoQ7mJV5IRGM+2KKZYo0QUfC13evEOcHAb6TPWgqEQtrw==",
+    "Microsoft.OpenApi/2.3.0": {
+      "sha512": "5RZpjyt0JMmoc/aEgY9c1vE5pusdDGvkPl9qKIy9KFbRiIXD+w7gBJxX+unSjzzOcfgRoYxnO4okZyqDAL2WEw==",
       "type": "package",
-      "path": "microsoft.openapi/2.4.1",
+      "path": "microsoft.openapi/2.3.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2804,7 +2804,7 @@
         "lib/netstandard2.0/Microsoft.OpenApi.dll",
         "lib/netstandard2.0/Microsoft.OpenApi.pdb",
         "lib/netstandard2.0/Microsoft.OpenApi.xml",
-        "microsoft.openapi.2.4.1.nupkg.sha512",
+        "microsoft.openapi.2.3.0.nupkg.sha512",
         "microsoft.openapi.nuspec"
       ]
     },
@@ -2967,24 +2967,24 @@
         "sqlitepclraw.provider.e_sqlite3.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore/10.1.7": {
-      "sha512": "vgef8DPT411JU5JjHiDbr0WOxsIVuAvegPGtqmm4Na4JRl/264dfBJcGkiPHsAr5P+Vda+qN1rZKRtBl1rF9aA==",
+    "Swashbuckle.AspNetCore/10.0.0": {
+      "sha512": "ciYIKYWeB1486X8CgUqrUgahqV8xAdzVPuxN2buW9VvmYcfwtziE2G5f+gE3QSVv+iKE01U7WKXyS1GadQjyuQ==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore/10.1.7",
+      "path": "swashbuckle.aspnetcore/10.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "build/Swashbuckle.AspNetCore.props",
         "buildMultiTargeting/Swashbuckle.AspNetCore.props",
         "docs/package-readme.md",
-        "swashbuckle.aspnetcore.10.1.7.nupkg.sha512",
+        "swashbuckle.aspnetcore.10.0.0.nupkg.sha512",
         "swashbuckle.aspnetcore.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.Swagger/10.1.7": {
-      "sha512": "EjLibt/d/QuRv170GoihTbcPUpgzSFm2WKHhnGJFZQ03JYzfuitsM79azaAR8NBwRunU7yScSX6HRE5JUlrEMQ==",
+    "Swashbuckle.AspNetCore.Swagger/10.0.0": {
+      "sha512": "X1GSq/Eh4FX58Jf7fjUyJLUoMh10jXv4VmT/BUqDAgKIkpo+UuL/SwGOZI+U8XiLFOxpAv4lGR0kFLVPs0wUIA==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.swagger/10.1.7",
+      "path": "swashbuckle.aspnetcore.swagger/10.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2998,14 +2998,14 @@
         "lib/net9.0/Swashbuckle.AspNetCore.Swagger.pdb",
         "lib/net9.0/Swashbuckle.AspNetCore.Swagger.xml",
         "package-readme.md",
-        "swashbuckle.aspnetcore.swagger.10.1.7.nupkg.sha512",
+        "swashbuckle.aspnetcore.swagger.10.0.0.nupkg.sha512",
         "swashbuckle.aspnetcore.swagger.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.SwaggerGen/10.1.7": {
-      "sha512": "PuubO9BjvNn6U3D9kLpuWKY1JtziWw7SsGBq0age1E50uQjQ8Fzl8s0EwzrLfANqYJNgDnJi9l7N1QxcGVB2Zw==",
+    "Swashbuckle.AspNetCore.SwaggerGen/10.0.0": {
+      "sha512": "B8C0JC1Iknubtslov37ZvDW9w53X9IQ05UFxXxJB41ZH8cwmzWTZnAXyvqeToJ/yZNfjdCOtKdwTSGiNkQvVuA==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.swaggergen/10.1.7",
+      "path": "swashbuckle.aspnetcore.swaggergen/10.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3019,14 +3019,14 @@
         "lib/net9.0/Swashbuckle.AspNetCore.SwaggerGen.pdb",
         "lib/net9.0/Swashbuckle.AspNetCore.SwaggerGen.xml",
         "package-readme.md",
-        "swashbuckle.aspnetcore.swaggergen.10.1.7.nupkg.sha512",
+        "swashbuckle.aspnetcore.swaggergen.10.0.0.nupkg.sha512",
         "swashbuckle.aspnetcore.swaggergen.nuspec"
       ]
     },
-    "Swashbuckle.AspNetCore.SwaggerUI/10.1.7": {
-      "sha512": "iJo3ODyUb/M8Vm8AH1r9y9iAba0w95xsCn3zFVl96ISRHbTDWxi+l7oFVCZqUEdjd97B8VMDPnMliWAdomR8uw==",
+    "Swashbuckle.AspNetCore.SwaggerUI/10.0.0": {
+      "sha512": "KfOQg2fFUBrKNRZKeXDKB6qnyRnAMhv7hKUXYdDuL3tPndwBZEh9K4w5gj+FJBvCpR24J7Z9nt1zVZ+J0ZVe2g==",
       "type": "package",
-      "path": "swashbuckle.aspnetcore.swaggerui/10.1.7",
+      "path": "swashbuckle.aspnetcore.swaggerui/10.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3040,7 +3040,7 @@
         "lib/net9.0/Swashbuckle.AspNetCore.SwaggerUI.pdb",
         "lib/net9.0/Swashbuckle.AspNetCore.SwaggerUI.xml",
         "package-readme.md",
-        "swashbuckle.aspnetcore.swaggerui.10.1.7.nupkg.sha512",
+        "swashbuckle.aspnetcore.swaggerui.10.0.0.nupkg.sha512",
         "swashbuckle.aspnetcore.swaggerui.nuspec"
       ]
     },
@@ -3262,7 +3262,8 @@
       "Microsoft.EntityFrameworkCore.Design >= 10.0.7",
       "Microsoft.EntityFrameworkCore.Sqlite >= 10.0.7",
       "Microsoft.EntityFrameworkCore.Tools >= 10.0.7",
-      "Swashbuckle.AspNetCore >= 10.1.7"
+      "Microsoft.OpenApi >= 2.3.0",
+      "Swashbuckle.AspNetCore >= 10.0.0"
     ]
   },
   "packageFolders": {
@@ -3344,9 +3345,13 @@
             "target": "Package",
             "version": "[10.0.7, )"
           },
+          "Microsoft.OpenApi": {
+            "target": "Package",
+            "version": "[2.3.0, )"
+          },
           "Swashbuckle.AspNetCore": {
             "target": "Package",
-            "version": "[10.1.7, )"
+            "version": "[10.0.0, )"
           }
         },
         "imports": [
