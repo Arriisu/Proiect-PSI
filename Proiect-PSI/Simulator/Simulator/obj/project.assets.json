@@ -89,11 +89,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
+      "projectUniqueName": "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
       "projectName": "Simulator",
-      "projectPath": "E:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
+      "projectPath": "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
       "packagesPath": "C:\\Users\\Roxana\\.nuget\\packages\\",
-      "outputPath": "E:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\obj\\",
+      "outputPath": "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

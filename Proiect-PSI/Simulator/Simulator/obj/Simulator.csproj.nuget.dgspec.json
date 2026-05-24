@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "e:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj": {}
+    "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj": {}
   },
   "projects": {
-    "e:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj": {
+    "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "e:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
+        "projectUniqueName": "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
         "projectName": "Simulator",
-        "projectPath": "e:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
+        "projectPath": "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
         "packagesPath": "C:\\Users\\Roxana\\.nuget\\packages\\",
-        "outputPath": "e:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\obj\\",
+        "outputPath": "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

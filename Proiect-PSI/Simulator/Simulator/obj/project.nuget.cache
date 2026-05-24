@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "ztVLwqKeITk=",
+  "dgSpecHash": "Rml19l3/npg=",
   "success": true,
-  "projectFilePath": "e:\\facultate\\Proiect_PSI2\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
+  "projectFilePath": "E:\\facultate\\PSI 5\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Roxana\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.7\\microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
     "C:\\Users\\Roxana\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
