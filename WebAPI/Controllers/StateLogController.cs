@@ -28,7 +28,8 @@ namespace WebAPI.Controllers
                 Timestamp = DateTime.UtcNow,
                 ChangedByUser = username,
                 StateJson = dto.StateJson,
-                ActionDescription = dto.ActionDescription
+                ActionDescription = dto.ActionDescription,
+                AlarmActive = dto.AlarmActive
             };
 
             _db.StateLogs.Add(log);
@@ -49,11 +50,26 @@ namespace WebAPI.Controllers
 
             return Ok(logs);
         }
+
+        [HttpGet("alarms")]
+        [Authorize]
+        public async Task<IActionResult> GetAlarms()
+        {
+            var alarms = await _db.StateLogs
+                .Where(s => s.AlarmActive == true)
+                .OrderByDescending(s => s.Timestamp)
+                .Take(50)
+                .ToListAsync();
+
+            return Ok(alarms);
+                
+        }
     }
 
     public class StateLogDto
     {
         public string StateJson { get; set; } = "{}";
         public string ActionDescription { get; set; } = string.Empty;
+        public bool AlarmActive { get; set; } = false;
     }
 }
