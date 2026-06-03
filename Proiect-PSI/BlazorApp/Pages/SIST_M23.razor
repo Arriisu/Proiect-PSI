@@ -2,6 +2,10 @@
 @page "/m23-monitor"
 @using System.Threading
 @implements IAsyncDisposable
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
 
 <style>
     .glass-panel {
@@ -187,30 +191,65 @@
     </div>
 </div>
 @code {
+    // Variabilele pentru desenarea interfeței
     private Dictionary<string, bool> MotorStates = new() { { "M1", false }, { "M2", false }, { "M3", false }, { "M4", false } };
     private string GatePosition = "S7";
     private List<LogEntry> Logs = new();
-    private Queue<int> ChartData = new(new int[40]); // Stores the last 40 data points for the graph
+    private Queue<int> ChartData = new(new int[40]);
     private bool SystemHealthy = true;
     private string CurrentPath => CalculatePath();
     private CancellationTokenSource _cts = new();
 
-    protected override void OnInitialized()
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
     {
-        AddLog("M23 System Initialized (Logic 1).");
-        AddLog("Safety Interlocks: Active.");
-        
-        // Populate chart with 0s initially
+        AddLog("Se conectează la Simulatorul M23...");
         for(int i=0; i<40; i++) ChartData.Enqueue(0);
+
+        // conexiune signalr
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7120/m23hub") 
+            .Build();
+
+        // asculta actualizari roxi
+        hubConnection.On<StareSistem>("PrimesteStareNoua", (stareBackend) =>
+        {
+            MotorStates["M1"] = stareBackend.Banda1Pornita;
+            MotorStates["M2"] = stareBackend.Banda2Pornita;
+            MotorStates["M3"] = stareBackend.Banda3Pornita;
+            MotorStates["M4"] = stareBackend.Banda4Pornita;
+            GatePosition = stareBackend.PozitieClapeta;
+            SystemHealthy = !stareBackend.EsteInEroare;
+            
+            AddLog("Interfață actualizată de la server.");
+            
+            // forteaza redesenarea ecranului instantaneu
+            InvokeAsync(StateHasChanged); 
+        });
+
+        await hubConnection.StartAsync();
+        AddLog("Conectat la SignalR cu succes!");
     }
+
+    // trimite comenzi controller senzori
+    private async Task ProcessCommand(string cmd)
+    {
+        AddLog($"Trimit comanda {cmd} către controller...");
+        await Http.PostAsync($"https://localhost:7120/api/ControllerSenzori/activare/{cmd}", null);
+    }
+
+    private async Task SetGate(string pos)
+    {
+        AddLog($"Schimbare clapetă: {pos}");
+        await Http.PostAsync($"https://localhost:7120/api/ControllerSenzori/activare/{pos}", null);
+    }
+
+    // fctii vizuale
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            // Start the background loop for the real-time graph
-            _ = UpdateGraphLoop(_cts.Token);
-        }
+        if (firstRender) _ = UpdateGraphLoop(_cts.Token);
     }
 
     private async Task UpdateGraphLoop(CancellationToken token)
@@ -218,108 +257,12 @@
         var rnd = new Random();
         while (!token.IsCancellationRequested)
         {
-            // Calculate load based on running input motors
-            int currentLoad = 0;
-            if (SystemHealthy && (MotorStates["M1"] || MotorStates["M2"]))
-            {
-                currentLoad = rnd.Next(75, 100); // Running load
-            }
-            else
-            {
-                currentLoad = rnd.Next(0, 5); // Idle noise
-            }
-
+            int currentLoad = (SystemHealthy && (MotorStates["M1"] || MotorStates["M2"])) ? rnd.Next(75, 100) : rnd.Next(0, 5);
             if (ChartData.Count >= 40) ChartData.Dequeue();
             ChartData.Enqueue(currentLoad);
-
             await InvokeAsync(StateHasChanged);
-            await Task.Delay(500, token); // Update every half second
+            await Task.Delay(500, token);
         }
-    }
-
-    private void ProcessCommand(string cmd)
-    {
-        if (cmd == "S0")
-        {
-            StopAll();
-            AddLog("EMERGENCY STOP (S0) triggered.", true);
-            return;
-        }
-
-        if (cmd == "S1" || cmd == "S2") 
-        {
-            HandleInputLogic(cmd);
-        }
-        else if (cmd == "S3" || cmd == "S4")
-        {
-            string mId = cmd == "S3" ? "M3" : "M4";
-            MotorStates[mId] = !MotorStates[mId];
-            AddLog($"{mId} manual toggle: {(MotorStates[mId] ? "ON" : "OFF")}");
-            ValidateState();
-        }
-    }
-
-    private void HandleInputLogic(string btnId)
-    {
-        string targetM = btnId == "S1" ? "M1" : "M2";
-        string otherM = btnId == "S1" ? "M2" : "M1";
-
-        if (!MotorStates[targetM])
-        {
-            bool outputValid = false;
-            if (GatePosition == "S6" && MotorStates["M3"]) outputValid = true;
-            else if (GatePosition == "S8" && MotorStates["M4"]) outputValid = true;
-            else if (GatePosition == "S7" && (MotorStates["M3"] || MotorStates["M4"])) outputValid = true;
-
-            if (outputValid)
-            {
-                MotorStates[otherM] = false;
-                MotorStates[targetM] = true;
-                AddLog($"{targetM} started. Flow active.");
-            }
-            else
-            {
-                AddLog($"Command Denied: No valid output path for {GatePosition}.", true);
-            }
-        }
-        else
-        {
-            MotorStates[targetM] = false;
-            AddLog($"{targetM} stopped.");
-        }
-    }
-
-    private void SetGate(string pos)
-    {
-        GatePosition = pos;
-        AddLog($"Gate position updated to {pos}.");
-        ValidateState();
-    }
-
-    private void ValidateState()
-    {
-        bool invalid = false;
-        if (GatePosition == "S6" && !MotorStates["M3"]) invalid = true;
-        if (GatePosition == "S8" && !MotorStates["M4"]) invalid = true;
-        if (GatePosition == "S7" && !MotorStates["M3"] && !MotorStates["M4"]) invalid = true;
-
-        if (invalid && (MotorStates["M1"] || MotorStates["M2"]))
-        {
-            MotorStates["M1"] = false;
-            MotorStates["M2"] = false;
-            AddLog("Automatic Trip: Output link lost. Inputs stopped.", true);
-            SystemHealthy = false;
-        }
-        else
-        {
-            SystemHealthy = true;
-        }
-    }
-
-    private void StopAll()
-    {
-        foreach (var key in MotorStates.Keys.ToList()) MotorStates[key] = false;
-        SystemHealthy = true;
     }
 
     private int GetGateRotation() => GatePosition == "S6" ? -45 : (GatePosition == "S8" ? 45 : 0);
@@ -348,5 +291,14 @@
         public string Message { get; set; } = ""; 
         public string Timestamp { get; set; } = ""; 
         public bool IsError { get; set; } 
+    }
+    public class StareSistem 
+    {
+    public bool Banda1Pornita { get; set; }
+    public bool Banda2Pornita { get; set; }
+    public bool Banda3Pornita { get; set; }
+    public bool Banda4Pornita { get; set; }
+    public string PozitieClapeta { get; set; } = "S7"; // S6, S7 sau S8
+    public bool EsteInEroare { get; set; }
     }
 }
