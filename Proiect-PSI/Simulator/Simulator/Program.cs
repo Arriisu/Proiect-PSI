@@ -1,4 +1,5 @@
 using Simulator;
+using Simulator.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<StareSistem>();
 builder.Services.AddHostedService<LogicaM23>();
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -24,5 +26,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<M23Hub>("/m23hub");
 
 app.Run();
