@@ -1,0 +1,32 @@
+@Simulator_HostAddress = http://localhost:5168
+
+<<<<<<< HEAD
+### 1. Vezi starea senzorilor (GET)
+GET {{Simulator_HostAddress}}/api/ControllerSenzori
+Accept: application/json
+
+###
+
+### 2. Porneste Banda 3 (S3)
+POST {{Simulator_HostAddress}}/api/ControllerSenzori/activare/S3
+
+###
+
+### 3. Seteaza Clapeta spre Stanga (S6)
+POST {{Simulator_HostAddress}}/api/ControllerSenzori/activare/S6
+
+###
+
+### 4. Porneste Banda 1 (S1)
+POST {{Simulator_HostAddress}}/api/ControllerSenzori/activare/S1
+
+###
+
+### 5. Stop General (S0)
+POST {{Simulator_HostAddress}}/api/ControllerSenzori/activare/S0
+=======
+GET {{Simulator_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+>>>>>>> 9a3f45f860c7427587e7b4dabacda86d15049016

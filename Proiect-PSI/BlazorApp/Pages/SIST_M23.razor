@@ -1,0 +1,327 @@
+@page "/"
+@page "/m23-monitor"
+@using System.Threading
+@implements IAsyncDisposable
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager Navigation
+@inject HttpClient Http
+
+
+<style>
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(226, 232, 240, 1);
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .belt-track {
+        height: 32px;
+        background: #e2e8f0;
+        border: 2px solid #94a3b8;
+        border-radius: 6px;
+        position: relative;
+        overflow: hidden;
+    }
+    .belt-animation {
+        position: absolute;
+        top: 0; left: 0; width: 200%; height: 100%;
+        background: repeating-linear-gradient(90deg, transparent, transparent 15px, rgba(148, 163, 184, 0.4) 15px, rgba(148, 163, 184, 0.4) 30px);
+        display: none;
+    }
+    .active .belt-animation {
+        display: block;
+        animation: conveyorRun 1s linear infinite;
+    }
+    @@keyframes conveyorRun {
+        from { transform: translateX(0); }
+        to { transform: translateX(-30px); }
+    }
+    .status-lamp {
+        width: 12px; height: 12px; border-radius: 50%; background: #cbd5e1; border: 1px solid #94a3b8;
+    }
+    .status-lamp.on {
+        background: #10b981;
+        box-shadow: 0 0 10px #10b981;
+        border-color: #059669;
+    }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+</style>
+
+<div class="min-h-screen bg-slate-100 p-4 md:p-8 font-sans">
+    
+    <!-- Header -->
+    <div class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">M23 Process Interface</h1>
+            <div class="flex items-center gap-2 mt-2 text-slate-600 text-sm font-medium">
+                <span class="flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Descrierea Funcțională 1 • Logica cu interblocare (Blazor)</span>
+            </div>
+        </div>
+
+        <div class="glass-panel px-6 py-4 flex gap-8 items-center bg-white shadow-sm">
+            <div class="text-center border-r-2 pr-8 border-slate-200">
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-widest mb-1">Health Status</p>
+                <p class="text-lg font-black @(SystemHealthy ? "text-emerald-500" : "text-rose-600")">
+                    @(SystemHealthy ? "100% OK" : "SYSTEM FAULT")
+                </p>
+            </div>
+            <div class="text-center pl-2">
+                <p class="text-[11px] text-slate-500 font-bold uppercase tracking-widest mb-1">Active Flow Path</p>
+                <p class="text-lg font-black text-indigo-600">@CurrentPath</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- Left Panel Controls -->
+        <div class="lg:col-span-3 space-y-6">
+            <div class="glass-panel p-6 border-t-8 border-t-rose-500 bg-white">
+                <button @onclick='() => ProcessCommand("S0")' 
+                        class="w-full py-5 bg-rose-50 border-2 border-rose-200 text-rose-700 rounded-xl font-extrabold hover:bg-rose-600 hover:text-white hover:border-rose-600 transition-all active:scale-95 shadow-sm uppercase tracking-widest text-sm">
+                    S0 - Emergency Stop
+                </button>
+            </div>
+
+            <div class="glass-panel p-6 bg-white">
+                <h3 class="text-xs font-black text-slate-400 uppercase mb-5 tracking-widest border-b pb-2">Actuator Controls</h3>
+                <div class="space-y-4">
+                    @foreach (var motor in new[] { ("S1", "M1 (Input 1)"), ("S2", "M2 (Input 2)"), ("S3", "M3 (Output 3)"), ("S4", "M4 (Output 4)") })
+                    {
+                        var mId = motor.Item2.Substring(0, 2);
+                        <button @onclick='() => ProcessCommand(motor.Item1)' 
+                                class="w-full p-4 rounded-xl border-2 transition-all flex items-center justify-between shadow-sm @(MotorStates[mId] ? "bg-indigo-600 border-indigo-700 text-white" : "bg-slate-50 border-slate-200 text-slate-700 hover:border-indigo-400 hover:bg-white")">
+                            <span class="text-sm font-bold tracking-tight">@motor.Item1: @motor.Item2</span>
+                            <div class="status-lamp @(MotorStates[mId] ? "on" : "")"></div>
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Center Digital Twin & Graph -->
+        <div class="lg:col-span-6 flex flex-col gap-6">
+            <div class="glass-panel p-8 flex flex-col items-center justify-center relative overflow-hidden flex-1 bg-white border-2 border-slate-200">
+                
+                <!-- Input Zone -->
+                <div class="flex justify-between w-full max-w-md mb-20">
+                    @foreach (var m in new[] { "M1", "M2" })
+                    {
+                        <div class="w-32 space-y-3 @(MotorStates[m] ? "active" : "")">
+                            <div class="flex justify-between text-xs font-bold px-1 @(MotorStates[m] ? "text-indigo-600" : "text-slate-500")">
+                                <span class="uppercase tracking-wider">In @m.Last()</span>
+                                <span class="bg-slate-100 px-1.5 py-0.5 rounded border">@m</span>
+                            </div>
+                            <div class="belt-track shadow-inner"><div class="belt-animation"></div></div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Central Gate Visualization -->
+                <div class="relative w-28 h-28 flex items-center justify-center bg-slate-50 rounded-full border-4 border-slate-100 shadow-inner">
+                    <div class="w-20 h-3 bg-slate-800 rounded-full transition-transform duration-500 shadow-xl" 
+                         style="transform: rotate(@(GetGateRotation())deg)"></div>
+                    <div class="absolute -top-7 bg-white px-2 py-0.5 rounded-full border shadow-sm text-[9px] font-black text-slate-500 tracking-wider">JUNCTION</div>
+                </div>
+
+                <!-- Output Zone -->
+                <div class="flex justify-between w-full max-w-md mt-20 mb-16">
+                    @foreach (var m in new[] { "M3", "M4" })
+                    {
+                        <div class="w-32 space-y-3 @(MotorStates[m] ? "active" : "")">
+                            <div class="belt-track shadow-inner"><div class="belt-animation"></div></div>
+                            <div class="flex justify-between text-xs font-bold px-1 @(MotorStates[m] ? "text-indigo-600" : "text-slate-500")">
+                                <span class="uppercase tracking-wider">Out @m.Last()</span>
+                                <span class="bg-slate-100 px-1.5 py-0.5 rounded border">@m</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Selector Gate Config -->
+                <div class="absolute bottom-6 bg-slate-200 p-1.5 rounded-2xl flex w-full max-w-xs shadow-inner border border-slate-300">
+                    @foreach (var pos in new[] { "S6", "S7", "S8" })
+                    {
+                        <button @onclick="() => SetGate(pos)" 
+                                class="flex-1 py-2 text-xs font-black rounded-xl transition-all @(GatePosition == pos ? "bg-white shadow-md text-indigo-700 border border-slate-100" : "text-slate-500 hover:text-slate-800 hover:bg-slate-100")">
+                            @pos
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- REAL-TIME GRAPH SECTION -->
+            <div class="glass-panel p-5 bg-white border-2 border-slate-200">
+                <div class="flex justify-between items-end mb-3 border-b pb-2">
+                    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Real-Time Flow Rate</h3>
+                    <span class="text-xs font-bold text-indigo-600">@ChartData.LastOrDefault()%</span>
+                </div>
+                <!-- CSS Bar Chart -->
+                <div class="flex items-end gap-[2px] h-20 w-full overflow-hidden">
+                    @foreach (var point in ChartData)
+                    {
+                        <div class="flex-1 bg-indigo-500 rounded-t-sm transition-all duration-300 ease-in-out opacity-80 hover:opacity-100" 
+                             style="height: @(point)%"></div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Diagnostics Log -->
+        <div class="lg:col-span-3">
+            <div class="glass-panel bg-[#0f172a] border-slate-700 p-6 h-full shadow-2xl flex flex-col">
+                <div class="flex items-center justify-between mb-6 border-b border-slate-700 pb-4">
+                    <h3 class="text-xs font-black text-slate-300 uppercase tracking-widest">System Events</h3>
+                    <span class="text-[10px] px-2 py-1 bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 rounded uppercase font-bold tracking-wider">Log</span>
+                </div>
+                <div class="flex-1 space-y-4 font-mono text-xs overflow-y-auto pr-2 custom-scrollbar max-h-[600px]">
+                    @foreach (var log in Logs)
+                    {
+                        <div class="border-l-4 @(log.IsError ? "border-rose-500 bg-rose-500/10 text-rose-200" : "border-slate-500 bg-slate-800/50 text-slate-300") p-3 rounded-r-md">
+                            <p class="opacity-50 text-[10px] mb-1 font-sans tracking-wider">@log.Timestamp</p>
+                            <p class="leading-snug">@log.Message</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    // Variabilele pentru desenarea interfeței
+    private Dictionary<string, bool> MotorStates = new() { { "M1", false }, { "M2", false }, { "M3", false }, { "M4", false } };
+    private string GatePosition = "S7";
+    private List<LogEntry> Logs = new();
+    private Queue<int> ChartData = new(new int[40]);
+    private bool SystemHealthy = true;
+    private string CurrentPath => CalculatePath();
+    private CancellationTokenSource _cts = new();
+
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AddLog("Se conectează la Simulatorul M23...");
+        for(int i=0; i<40; i++) ChartData.Enqueue(0);
+
+        // conexiune signalr
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl("http://localhost:5168/m23hub") 
+            .Build();
+
+        // asculta actualizari roxi
+        hubConnection.On<StareSistem>("PrimesteStareNoua", (stareBackend) =>
+        {
+            MotorStates["M1"] = stareBackend.P1;
+            MotorStates["M2"] = stareBackend.P2;
+            MotorStates["M3"] = stareBackend.P3;
+            MotorStates["M4"] = stareBackend.P4;
+
+            if (stareBackend.S6) GatePosition = "S6";
+            else if (stareBackend.S8) GatePosition = "S8";
+            else GatePosition = "S7";
+
+            SystemHealthy = !stareBackend.IsAlarmActive;
+            
+            InvokeAsync(StateHasChanged);
+        });
+
+        try 
+        {
+            await hubConnection.StartAsync();
+            AddLog("Conectat la SignalR cu succes!");
+            
+            // Trimite comanda de RESET către backend la fiecare refresh de pagină
+            await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/RESET", null);
+        }
+        catch (Exception ex)
+        {
+            AddLog($"Eroare conexiune: {ex.Message}", true);
+        }
+    }
+
+    // trimite comenzi controller senzori
+    private async Task ProcessCommand(string cmd)
+    {
+        AddLog($"Trimit comanda {cmd} către controller...");
+        await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/{cmd}", null);
+    }
+
+    private async Task SetGate(string pos)
+    {
+        AddLog($"Schimbare clapetă: {pos}");
+        await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/{pos}", null);
+    }
+
+    // fctii vizuale
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) _ = UpdateGraphLoop(_cts.Token);
+    }
+
+    private async Task UpdateGraphLoop(CancellationToken token)
+    {
+        var rnd = new Random();
+        while (!token.IsCancellationRequested)
+        {
+            int currentLoad = (SystemHealthy && (MotorStates["M1"] || MotorStates["M2"])) ? rnd.Next(75, 100) : rnd.Next(0, 5);
+            if (ChartData.Count >= 40) ChartData.Dequeue();
+            ChartData.Enqueue(currentLoad);
+            await InvokeAsync(StateHasChanged);
+            await Task.Delay(500, token);
+        }
+    }
+
+    private int GetGateRotation() => GatePosition == "S6" ? -45 : (GatePosition == "S8" ? 45 : 0);
+
+    private string CalculatePath()
+    {
+        if (MotorStates["M1"]) return $"M1 → {(GatePosition == "S6" ? "M3" : (GatePosition == "S8" ? "M4" : "MIX"))}";
+        if (MotorStates["M2"]) return $"M2 → {(GatePosition == "S6" ? "M3" : (GatePosition == "S8" ? "M4" : "MIX"))}";
+        return "SYSTEM IDLE";
+    }
+
+    private void AddLog(string msg, bool isErr = false)
+    {
+        Logs.Insert(0, new LogEntry { Message = msg, IsError = isErr, Timestamp = DateTime.Now.ToString("HH:mm:ss") });
+        if (Logs.Count > 50) Logs.RemoveAt(50);
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _cts.Cancel();
+        _cts.Dispose();
+        return ValueTask.CompletedTask;
+    }
+
+    public class LogEntry { 
+        public string Message { get; set; } = ""; 
+        public string Timestamp { get; set; } = ""; 
+        public bool IsError { get; set; } 
+    }
+    // Această clasă stă la tine pe frontend ca să "citească" datele primite de la Hub
+    public class StareSistem
+    {
+        public bool S0 { get; set; }
+        public bool S1 { get; set; }
+        public bool S2 { get; set; }
+        public bool S3 { get; set; }
+        public bool S4 { get; set; }
+        public bool S5 { get; set; }
+        public bool S6 { get; set; }
+        public bool S7 { get; set; }
+        public bool S8 { get; set; }
+
+        public bool P1 { get; set; }
+        public bool P2 { get; set; }
+        public bool P3 { get; set; }
+        public bool P4 { get; set; }
+
+        public bool IsAlarmActive { get; set; }
+        public string MesajSistem { get; set; } = "";
+    }
+}
