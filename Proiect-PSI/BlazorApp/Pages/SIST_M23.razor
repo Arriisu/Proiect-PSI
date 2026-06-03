@@ -215,6 +215,9 @@
         // asculta actualizari roxi
         hubConnection.On<StareSistem>("PrimesteStareNoua", (stareBackend) =>
         {
+            Console.WriteLine("A VENIT O STARE NOUA DE LA SERVER!!!!!!!!");
+            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(stareBackend));
+
             MotorStates["M1"] = stareBackend.Banda1Pornita;
             MotorStates["M2"] = stareBackend.Banda2Pornita;
             MotorStates["M3"] = stareBackend.Banda3Pornita;
