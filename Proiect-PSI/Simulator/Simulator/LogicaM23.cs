@@ -1,10 +1,18 @@
+using Microsoft.AspNetCore.SignalR;
+using Simulator.Hubs;
+
 namespace Simulator
 {
     public class LogicaM23 : BackgroundService
     {
         private readonly StareSistem _stare;
+        private readonly IHubContext<M23Hub> _hubContext;
 
-        public LogicaM23(StareSistem stare) => _stare = stare;
+        public LogicaM23(StareSistem stare, IHubContext<M23Hub> hubContext) 
+        {
+            _stare = stare;
+            _hubContext = hubContext;
+        }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -30,6 +38,8 @@ namespace Simulator
 
                 // Trimitem starea calculată înapoi în "Memorie"
                 _stare.ActualizeazaFunctionareBenzi(p1, p2, p3, p4);
+
+                await _hubContext.Clients.All.SendAsync("PrimesteStareNoua", _stare, stoppingToken);
 
                 await Task.Delay(100, stoppingToken);
             }
