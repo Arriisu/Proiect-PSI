@@ -1,0 +1,65 @@
+:host {
+    display: block;
+}
+
+.top-row {
+    padding-left: 1rem; /* ps-3 equivalent */
+    background-color: #343a40; /* navbar-dark */
+    color: #fff;
+}
+
+.top-row .container-fluid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-brand {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.navbar-toggler {
+    background: transparent;
+    border: none;
+    color: #fff;
+}
+
+.collapse {
+    display: none;
+}
+
+.nav-item {
+    padding-left: 1rem; /* px-3 */
+    padding-right: 1rem;
+}
+
+.nav-link {
+    color: #212529;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+}
+
+.nav-link.active {
+    font-weight: 600;
+}
+
+nav.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Utility icons (placeholder) */
+.oi {
+    font-size: 1rem;
+}
+
+/* Responsive simple behavior */
+@media (min-width: 768px) {
+    .collapse {
+        display: block;
+    }
+}
