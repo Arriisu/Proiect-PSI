@@ -215,24 +215,32 @@
         // asculta actualizari roxi
         hubConnection.On<StareSistem>("PrimesteStareNoua", (stareBackend) =>
         {
-            Console.WriteLine("A VENIT O STARE NOUA DE LA SERVER!!!!!!!!");
-            Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(stareBackend));
+            MotorStates["M1"] = stareBackend.P1;
+            MotorStates["M2"] = stareBackend.P2;
+            MotorStates["M3"] = stareBackend.P3;
+            MotorStates["M4"] = stareBackend.P4;
 
-            MotorStates["M1"] = stareBackend.Banda1Pornita;
-            MotorStates["M2"] = stareBackend.Banda2Pornita;
-            MotorStates["M3"] = stareBackend.Banda3Pornita;
-            MotorStates["M4"] = stareBackend.Banda4Pornita;
-            GatePosition = stareBackend.PozitieClapeta;
-            SystemHealthy = !stareBackend.EsteInEroare;
+            if (stareBackend.S6) GatePosition = "S6";
+            else if (stareBackend.S8) GatePosition = "S8";
+            else GatePosition = "S7";
+
+            SystemHealthy = !stareBackend.IsAlarmActive;
             
-            AddLog("Interfață actualizată de la server.");
-            
-            // forteaza redesenarea ecranului instantaneu
-            InvokeAsync(StateHasChanged); 
+            InvokeAsync(StateHasChanged);
         });
 
-        await hubConnection.StartAsync();
-        AddLog("Conectat la SignalR cu succes!");
+        try 
+        {
+            await hubConnection.StartAsync();
+            AddLog("Conectat la SignalR cu succes!");
+            
+            // Trimite comanda de RESET către backend la fiecare refresh de pagină
+            await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/RESET", null);
+        }
+        catch (Exception ex)
+        {
+            AddLog($"Eroare conexiune: {ex.Message}", true);
+        }
     }
 
     // trimite comenzi controller senzori
@@ -295,13 +303,25 @@
         public string Timestamp { get; set; } = ""; 
         public bool IsError { get; set; } 
     }
-    public class StareSistem 
+    // Această clasă stă la tine pe frontend ca să "citească" datele primite de la Hub
+    public class StareSistem
     {
-    public bool Banda1Pornita { get; set; }
-    public bool Banda2Pornita { get; set; }
-    public bool Banda3Pornita { get; set; }
-    public bool Banda4Pornita { get; set; }
-    public string PozitieClapeta { get; set; } = "S7"; // S6, S7 sau S8
-    public bool EsteInEroare { get; set; }
+        public bool S0 { get; set; }
+        public bool S1 { get; set; }
+        public bool S2 { get; set; }
+        public bool S3 { get; set; }
+        public bool S4 { get; set; }
+        public bool S5 { get; set; }
+        public bool S6 { get; set; }
+        public bool S7 { get; set; }
+        public bool S8 { get; set; }
+
+        public bool P1 { get; set; }
+        public bool P2 { get; set; }
+        public bool P3 { get; set; }
+        public bool P4 { get; set; }
+
+        public bool IsAlarmActive { get; set; }
+        public string MesajSistem { get; set; } = "";
     }
 }
