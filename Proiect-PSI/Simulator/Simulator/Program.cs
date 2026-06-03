@@ -25,6 +25,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+app.UseRouting();
+
 app.MapControllers();
 
 app.MapHub<M23Hub>("/m23hub");
