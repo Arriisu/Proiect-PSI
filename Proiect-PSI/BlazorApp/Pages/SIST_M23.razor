@@ -209,7 +209,7 @@
 
         // conexiune signalr
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7120/m23hub") 
+            .WithUrl("http://localhost:5168/m23hub") 
             .Build();
 
         // asculta actualizari roxi
@@ -236,13 +236,13 @@
     private async Task ProcessCommand(string cmd)
     {
         AddLog($"Trimit comanda {cmd} către controller...");
-        await Http.PostAsync($"https://localhost:7120/api/ControllerSenzori/activare/{cmd}", null);
+        await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/{cmd}", null);
     }
 
     private async Task SetGate(string pos)
     {
         AddLog($"Schimbare clapetă: {pos}");
-        await Http.PostAsync($"https://localhost:7120/api/ControllerSenzori/activare/{pos}", null);
+        await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/{pos}", null);
     }
 
     // fctii vizuale
