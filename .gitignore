@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+bin/
+obj/
+.vs/
+*.user
+=======
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -38,3 +44,4 @@ node_modules/
 # Environment files
 .env
 .env.local
+>>>>>>> 9a3f45f860c7427587e7b4dabacda86d15049016
