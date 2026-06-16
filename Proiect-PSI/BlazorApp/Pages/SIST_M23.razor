@@ -7,13 +7,7 @@
 
 <style>
     .banda-mecanica {
-        background: repeating-linear-gradient(
-            -45deg,
-            #374151,
-            #374151 15px,
-            #1f2937 15px,
-            #1f2937 30px
-        );
+        background: repeating-linear-gradient(-45deg, #374151, #374151 15px, #1f2937 15px, #1f2937 30px);
         transition: background-position 0.1s linear;
     }
     .banda-activa {
@@ -25,7 +19,6 @@
         0% { background-position: 0 0; }
         100% { background-position: 42.42px 0; }
     }
-    
     .alarma-activa {
         animation: flash-alarma 0.5s alternate infinite;
     }
@@ -37,18 +30,15 @@
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
 </style>
 
-<div class="min-h-screen bg-gray-900 text-white p-4 md:p-6 font-sans @(IsAlarmActive ? "alarma-activa" : "")">
+<div class="min-h-screen bg-gray-900 text-white p-6 font-sans @(IsAlarmActive ? "alarma-activa" : "")">
     
-    <div class="flex justify-between items-center mb-6 bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+    <div class="flex justify-between items-center mb-8 bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
         <div>
             <h1 class="text-3xl font-bold text-blue-400">Sistem de încărcare cu benzi (M23)</h1>
-            <div class="flex items-center gap-2 mt-1 text-gray-400 text-sm font-medium">
-                <span class="flex h-2.5 w-2.5 rounded-full bg-green-500 animate-pulse"></span>
-                <span>Interfață HMI - Live SignalR Control</span>
-            </div>
+            <p class="text-gray-400 mt-1">Interfață HMI - Conectat în Timp Real prin SignalR</p>
         </div>
         <div class="flex flex-col items-end">
-            <span class="text-sm text-gray-400 mb-2">Mod Funcționare Server:</span>
+            <span class="text-sm text-gray-400 mb-2">Mod Funcționare:</span>
             <div class="flex space-x-2">
                 <button class="px-4 py-2 rounded-md font-bold transition @(CurrentMode == 1 ? "bg-blue-600 text-white" : "bg-gray-700 text-gray-400 hover:bg-gray-600")"
                         @onclick="() => SetMode(1)" disabled="@IsAlarmActive">
@@ -64,18 +54,18 @@
 
     @if (IsAlarmActive)
     {
-        <div class="bg-red-600 text-white font-bold text-center p-3 rounded-lg mb-6 text-lg tracking-widest shadow-lg border-2 border-red-300">
-            ⚠️ ALARMĂ CRITICĂ: SISTEM OPRIT DE SERVER ⚠️
+        <div class="bg-red-600 text-white font-bold text-center p-4 rounded-lg mb-6 text-xl tracking-widest shadow-lg border-2 border-red-300 animate-pulse">
+            ⚠️ ALARMĂ CRITICĂ: SENZORI BLOCAȚI SIMULTAN - SISTEM BLOCAT DIN SERVER (5 SEC) ⚠️
         </div>
     }
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         <div class="lg:col-span-3 space-y-6">
-            <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md">
-                <button class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-4 px-4 rounded shadow-lg active:scale-95 transition mb-4 uppercase tracking-widest text-sm"
-                        @onclick='() => SendCommand("S0")' disabled="@IsAlarmActive">
-                    [S0] Oprire Totală
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg">
+                <button class="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 px-4 rounded shadow-lg active:scale-95 transition mb-4 uppercase tracking-wider text-sm"
+                        @onclick='() => SendCommand("S0")'>
+                    [S0] Oprire Totală / Deblocare
                 </button>
                 <button class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold py-3 px-4 rounded shadow-lg active:scale-95 transition"
                         @onclick='() => SendCommand("S5")' disabled="@IsAlarmActive">
@@ -83,203 +73,195 @@
                 </button>
             </div>
 
-            <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md">
-                <h3 class="text-xs font-black text-gray-400 uppercase mb-4 tracking-widest border-b border-gray-600 pb-2">Comenzi Actuatori</h3>
-                <div class="space-y-3">
-                    <button class="w-full py-3 rounded font-bold shadow-md transition flex items-center justify-between px-4 @(Band1 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")"
-                            @onclick='() => SendCommand("S1")' disabled="@IsAlarmActive">
-                        <span>[S1] Banda 1</span>
-                        @if(Band1) { <span class="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-[0_0_8px_#86efac]"></span> }
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 shadow-lg">
+                <span class="text-sm text-gray-400 block mb-3 font-bold uppercase tracking-wide border-b border-gray-700 pb-2">Comenzi Manuale</span>
+                <div class="grid grid-cols-1 gap-3">
+                    <button class="py-3 px-4 rounded font-bold transition flex justify-between items-center @(Band1 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")" @onclick='() => SendCommand("S1")' disabled="@IsAlarmActive">
+                        <span>[S1] Banda 1</span> @if(Band1) { <span class="w-2 h-2 bg-green-300 rounded-full animate-ping"></span> }
                     </button>
-                    <button class="w-full py-3 rounded font-bold shadow-md transition flex items-center justify-between px-4 @(Band2 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")"
-                            @onclick='() => SendCommand("S2")' disabled="@IsAlarmActive">
-                        <span>[S2] Banda 2</span>
-                        @if(Band2) { <span class="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-[0_0_8px_#86efac]"></span> }
+                    <button class="py-3 px-4 rounded font-bold transition flex justify-between items-center @(Band2 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")" @onclick='() => SendCommand("S2")' disabled="@IsAlarmActive">
+                        <span>[S2] Banda 2</span> @if(Band2) { <span class="w-2 h-2 bg-green-300 rounded-full animate-ping"></span> }
                     </button>
-                    <button class="w-full py-3 rounded font-bold shadow-md transition flex items-center justify-between px-4 @(Band3 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")"
-                            @onclick='() => SendCommand("S3")' disabled="@IsAlarmActive">
-                        <span>[S3] Banda 3</span>
-                        @if(Band3) { <span class="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-[0_0_8px_#86efac]"></span> }
+                    <button class="py-3 px-4 rounded font-bold transition flex justify-between items-center @(Band3 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")" @onclick='() => SendCommand("S3")' disabled="@IsAlarmActive">
+                        <span>[S3] Banda 3</span> @if(Band3) { <span class="w-2 h-2 bg-green-300 rounded-full animate-ping"></span> }
                     </button>
-                    <button class="w-full py-3 rounded font-bold shadow-md transition flex items-center justify-between px-4 @(Band4 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")"
-                            @onclick='() => SendCommand("S4")' disabled="@IsAlarmActive">
-                        <span>[S4] Banda 4</span>
-                        @if(Band4) { <span class="w-3 h-3 bg-green-300 rounded-full animate-pulse shadow-[0_0_8px_#86efac]"></span> }
+                    <button class="py-3 px-4 rounded font-bold transition flex justify-between items-center @(Band4 ? "bg-green-600 text-white" : "bg-gray-700 text-gray-300 hover:bg-gray-600")" @onclick='() => SendCommand("S4")' disabled="@IsAlarmActive">
+                        <span>[S4] Banda 4</span> @if(Band4) { <span class="w-2 h-2 bg-green-300 rounded-full animate-ping"></span> }
                     </button>
                 </div>
             </div>
-            
+
             @if (CurrentMode == 2)
             {
-                <button class="w-full bg-red-900 border border-red-500 hover:bg-red-800 text-red-200 font-bold py-3 px-4 rounded shadow-lg transition"
-                        @onclick='() => SendCommand("ALARM")' disabled="@IsAlarmActive">
-                    ⚠️ Simulare Eroare Senzori
-                </button>
+                <div class="bg-gray-800 p-4 rounded-lg border border-gray-700 shadow-md">
+                    <button class="w-full bg-red-950 border border-red-600 hover:bg-red-900 text-red-200 font-bold py-3 px-4 rounded transition"
+                            @onclick='() => SendCommand("ALARM")' disabled="@IsAlarmActive">
+                        ⚠️ Simulare Eroare Senzori
+                    </button>
+                </div>
             }
         </div>
 
         <div class="lg:col-span-6 flex flex-col gap-6">
-            
-            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 flex flex-col items-center relative shadow-md flex-1">
+            <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 flex flex-col items-center relative shadow-lg flex-1">
+                <h2 class="text-xl font-semibold mb-6 text-gray-300 w-full border-b border-gray-600 pb-2">Vizualizare Proces Central</h2>
                 
-                <div class="flex justify-between w-full max-w-lg mb-2">
+                <div class="flex justify-between w-full max-w-2xl mb-2">
                     <div class="flex flex-col items-center">
                         <span class="mb-2 font-bold @(Band1 ? "text-green-400" : "text-gray-500")">Banda 1 (M1)</span>
-                        <div class="w-32 h-12 rounded-full border-4 border-gray-600 banda-mecanica @(Band1 ? "banda-activa" : "")"></div>
+                        <div class="w-32 h-14 rounded-full border-4 border-gray-600 banda-mecanica @(Band1 ? "banda-activa" : "")"></div>
                     </div>
                     <div class="flex flex-col items-center">
                         <span class="mb-2 font-bold @(Band2 ? "text-green-400" : "text-gray-500")">Banda 2 (M2)</span>
-                        <div class="w-32 h-12 rounded-full border-4 border-gray-600 banda-mecanica @(Band2 ? "banda-activa" : "")"></div>
+                        <div class="w-32 h-14 rounded-full border-4 border-gray-600 banda-mecanica @(Band2 ? "banda-activa" : "")"></div>
                     </div>
                 </div>
 
                 <div class="w-64 h-36 bg-gray-900 border border-gray-600 rounded-lg flex items-center justify-center relative my-4 shadow-inner">
-                    <span class="absolute top-2 left-2 text-xs text-gray-500 font-bold">Punct Intersecție</span>
+                    <span class="absolute top-2 left-2 text-xs text-gray-500">Punct Intersecție</span>
                     <span class="absolute top-2 right-2 text-sm font-bold text-yellow-400">Clapetă: @FlapState</span>
                     
-                    <svg width="150" height="80" viewBox="0 0 150 100" class="mt-4">
+                    <svg width="150" height="90" viewBox="0 0 150 100" class="mt-4">
                         @if (FlapState == "S6") {
-                            <path d="M 20 0 L 20 100" stroke="@(Band1 && Band3 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" class="@(Band1 && Band3 ? "animate-pulse" : "")" />
-                            <path d="M 130 0 L 130 100" stroke="@(Band2 && Band4 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" class="@(Band2 && Band4 ? "animate-pulse" : "")" />
+                            <path d="M 20 0 L 20 100" stroke="@(Band1 && Band3 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" />
+                            <path d="M 130 0 L 130 100" stroke="@(Band2 && Band4 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" />
                         } else if (FlapState == "S7") {
-                            <path d="M 20 0 Q 75 50 20 100" stroke="@(Band1 && Band3 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" class="@(Band1 && Band3 ? "animate-pulse" : "")" />
-                            <path d="M 130 0 Q 75 50 130 100" stroke="@(Band2 && Band4 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" class="@(Band2 && Band4 ? "animate-pulse" : "")" />
+                            <path d="M 20 0 Q 75 50 20 100" stroke="@(Band1 && Band3 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" />
+                            <path d="M 130 0 Q 75 50 130 100" stroke="@(Band2 && Band4 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" />
                             <circle cx="75" cy="50" r="10" fill="#f59e0b" /> 
                         } else if (FlapState == "S8") {
-                            <path d="M 20 0 L 130 100" stroke="@(Band1 && Band4 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" class="@(Band1 && Band4 ? "animate-pulse" : "")" />
-                            <path d="M 130 0 L 20 100" stroke="@(Band2 && Band3 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" class="@(Band2 && Band3 ? "animate-pulse" : "")" />
+                            <path d="M 20 0 L 130 100" stroke="@(Band1 && Band4 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" />
+                            <path d="M 130 0 L 20 100" stroke="@(Band2 && Band3 ? "#10b981" : "#4b5563")" stroke-width="8" fill="none" />
                         }
                     </svg>
                 </div>
 
-                <div class="flex justify-between w-full max-w-lg mt-2 mb-6">
+                <div class="flex justify-between w-full max-w-2xl mt-2 mb-6">
                     <div class="flex flex-col items-center">
-                        <div class="w-32 h-12 rounded-full border-4 border-gray-600 banda-mecanica @(Band3 ? "banda-activa" : "")"></div>
+                        <div class="w-32 h-14 rounded-full border-4 border-gray-600 banda-mecanica @(Band3 ? "banda-activa" : "")"></div>
                         <span class="mt-2 font-bold @(Band3 ? "text-green-400" : "text-gray-500")">Banda 3 (M3)</span>
                     </div>
                     <div class="flex flex-col items-center">
-                        <div class="w-32 h-12 rounded-full border-4 border-gray-600 banda-mecanica @(Band4 ? "banda-activa" : "")"></div>
+                        <div class="w-32 h-14 rounded-full border-4 border-gray-600 banda-mecanica @(Band4 ? "banda-activa" : "")"></div>
                         <span class="mt-2 font-bold @(Band4 ? "text-green-400" : "text-gray-500")">Banda 4 (M4)</span>
                     </div>
                 </div>
 
-                <div class="w-full max-w-xs bg-gray-900 p-2 rounded-lg border border-gray-700 shadow-inner flex justify-between space-x-2">
-                    <button class="flex-1 py-2 rounded font-bold transition @(FlapState == "S6" ? "bg-yellow-500 text-gray-900" : "bg-gray-700 text-gray-300 hover:bg-gray-600")"
-                            @onclick='() => SendCommand("S6")' disabled="@IsAlarmActive">S6</button>
-                    <button class="flex-1 py-2 rounded font-bold transition @(FlapState == "S7" ? "bg-yellow-500 text-gray-900" : "bg-gray-700 text-gray-300 hover:bg-gray-600")"
-                            @onclick='() => SendCommand("S7")' disabled="@IsAlarmActive">S7</button>
-                    <button class="flex-1 py-2 rounded font-bold transition @(FlapState == "S8" ? "bg-yellow-500 text-gray-900" : "bg-gray-700 text-gray-300 hover:bg-gray-600")"
-                            @onclick='() => SendCommand("S8")' disabled="@IsAlarmActive">S8</button>
+                <div class="bg-gray-900 p-2 rounded-lg border border-gray-700 w-full max-w-xs flex justify-between space-x-2 shadow-inner">
+                    <button class="flex-1 py-2 rounded font-bold transition @(FlapState == "S6" ? "bg-yellow-500 text-gray-900" : "bg-gray-700 text-gray-300 hover:bg-gray-600")" @onclick='() => SendCommand("S6")' disabled="@IsAlarmActive">S6</button>
+                    <button class="flex-1 py-2 rounded font-bold transition @(FlapState == "S7" ? "bg-yellow-500 text-gray-900" : "bg-gray-700 text-gray-300 hover:bg-gray-600")" @onclick='() => SendCommand("S7")' disabled="@IsAlarmActive">S7</button>
+                    <button class="flex-1 py-2 rounded font-bold transition @(FlapState == "S8" ? "bg-yellow-500 text-gray-900" : "bg-gray-700 text-gray-300 hover:bg-gray-600")" @onclick='() => SendCommand("S8")' disabled="@IsAlarmActive">S8</button>
                 </div>
             </div>
 
             <div class="bg-gray-800 p-5 rounded-lg border border-gray-700 shadow-md">
                 <div class="flex justify-between items-end mb-3 border-b border-gray-700 pb-2">
-                    <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Real-Time Flow Rate</h3>
-                    <span class="text-xs font-bold text-blue-400">@ChartData.LastOrDefault()%</span>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Real-Time Flow Rate (Simulat)</h3>
+                    <span class="text-xs font-bold text-purple-400">@ChartData.LastOrDefault()%</span>
                 </div>
-                <div class="flex items-end gap-[2px] h-20 w-full overflow-hidden">
+                <div class="flex items-end gap-[3px] h-20 w-full overflow-hidden">
                     @foreach (var point in ChartData)
                     {
-                        <div class="flex-1 bg-blue-500 rounded-t-sm transition-all duration-300 ease-in-out opacity-80" 
-                             style="height: @(point)%"></div>
+                        <div class="flex-1 bg-purple-500 rounded-t-sm transition-all duration-300 ease-in-out opacity-80" style="height: @(point)%"></div>
                     }
                 </div>
             </div>
         </div>
 
         <div class="lg:col-span-3">
-            <div class="bg-gray-900 border border-gray-700 p-5 rounded-lg h-full shadow-md flex flex-col min-h-[500px]">
+            <div class="bg-gray-800 border border-gray-700 p-5 rounded-lg h-full shadow-lg flex flex-col min-h-[500px]">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-700 pb-3">
-                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">System Events</h3>
-                    <span class="text-[10px] px-2 py-1 bg-blue-900 text-blue-300 rounded uppercase font-bold tracking-wider">Log</span>
+                    <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest">Live System Events</h3>
+                    <span class="text-[10px] px-2 py-1 bg-purple-900 text-purple-300 rounded uppercase font-bold tracking-wider">SignalR</span>
                 </div>
-                <div class="flex-1 space-y-3 font-mono text-xs overflow-y-auto pr-2 custom-scrollbar max-h-[600px]">
+                <div class="flex-1 space-y-3 font-mono text-xs overflow-y-auto pr-1 custom-scrollbar max-h-[550px]">
                     @foreach (var log in Logs)
                     {
-                        <div class="border-l-4 @(log.IsError ? "border-red-500 bg-red-900/30 text-red-200" : "border-gray-500 bg-gray-800 text-gray-300") p-3 rounded-r-md">
-                            <p class="opacity-50 text-[10px] mb-1 font-sans tracking-wider">@log.Timestamp</p>
-                            <p class="leading-snug">@log.Message</p>
+                        <div class="border-l-4 @(log.IsError ? "border-red-500 bg-red-900/20 text-red-300" : "border-gray-600 bg-gray-900 text-gray-300") p-3 rounded-r-md shadow-sm animate-fade-in">
+                            <p class="opacity-50 text-[9px] mb-1">@log.Timestamp</p>
+                            <p class="leading-tight">@log.Message</p>
                         </div>
                     }
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
 @code {
-
     private HubConnection? hubConnection;
     private CancellationTokenSource _cts = new();
 
-    private bool Band1 { get; set; } = false;
-    private bool Band2 { get; set; } = false;
-    private bool Band3 { get; set; } = false;
-    private bool Band4 { get; set; } = false;
-
-    // stare intersectie/clapeta
-    private string FlapState { get; set; } = "S7"; // S6, S7, S8
-
-    // mod functionare si erori
-    private int CurrentMode { get; set; } = 1;
-    private bool IsAlarmActive { get; set; } = false;
+    private bool Band1, Band2, Band3, Band4;
+    private string FlapState = "S7";
+    private bool IsAlarmActive = false;
+    private int CurrentMode = 1;
 
     private Queue<int> ChartData = new(new int[40]);
     private List<LogEntry> Logs = new();
 
+    private string _lastStateCache = "";
 
     protected override async Task OnInitializedAsync()
     {
         for (int i = 0; i < 40; i++) ChartData.Enqueue(0);
-        AddLog("Se inițializează interfața HMI...");
+        AddLog("HMI Initialized. Se conectează la SignalR...");
 
-        // ==========================================
-        // CONEXIUNEA TA SIGNALR - CREIERUL ESTE BACKEND-UL
-        // ==========================================
         hubConnection = new HubConnectionBuilder()
-            .WithUrl("http://localhost:5168/m23hub") // Verifica portul backend-ului tau!
+            .WithUrl("http://localhost:5168/m23hub")
             .Build();
 
-        hubConnection.On<StareSistem>("PrimesteStareNoua", (stareBackend) =>
+        hubConnection.On<StareSistem>("PrimesteStareNoua", (stare) =>
         {
-            // Interfața ascultă exclusiv de ce zice serverul
-            Band1 = stareBackend.P1;
-            Band2 = stareBackend.P2;
-            Band3 = stareBackend.P3;
-            Band4 = stareBackend.P4;
+            Band1 = stare.P1;
+            Band2 = stare.P2;
+            Band3 = stare.P3;
+            Band4 = stare.P4;
+            CurrentMode = stare.CurrentMode;
+            IsAlarmActive = stare.IsAlarmActive;
 
-            if (stareBackend.S6) FlapState = "S6";
-            else if (stareBackend.S8) FlapState = "S8";
+            if (stare.S6) FlapState = "S6";
+            else if (stare.S8) FlapState = "S8";
             else FlapState = "S7";
 
-            if (!IsAlarmActive && stareBackend.IsAlarmActive) AddLog("SERVER: Alarmă Activată!", true);
-            if (IsAlarmActive && !stareBackend.IsAlarmActive) AddLog("SERVER: Alarmă Resetată.");
-            
-            IsAlarmActive = stareBackend.IsAlarmActive;
-            
+            // Verificăm dacă s-a schimbat ceva vizibil ca să logăm în listă
+            string currentSnapshot = $"{Band1}-{Band2}-{Band3}-{Band4}-{FlapState}-{IsAlarmActive}-{stare.S0}";
+            if (currentSnapshot != _lastStateCache)
+            {
+                _lastStateCache = currentSnapshot;
+                if(stare.S0) AddLog("SERVER: Stop General [S0] este activ!", true);
+                else if(IsAlarmActive) AddLog("SERVER: Alarmă Critică! Senzori Blocați!", true);
+                else AddLog($"Update primit: M1={Band1}, M2={Band2}, M3={Band3}, M4={Band4}, Clapetă={FlapState}");
+            }
+
             InvokeAsync(StateHasChanged);
         });
 
-        try 
-        {
+        try {
             await hubConnection.StartAsync();
-            AddLog("Conectat la Server (SignalR) cu succes!");
-            await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/RESET", null);
-        }
-        catch (Exception ex)
-        {
-            AddLog($"Eroare conexiune server: {ex.Message}", true);
+            AddLog("Conexiune SignalR Activă!");
+            await Http.PostAsync("http://localhost:5168/api/ControllerSenzori/activare/RESET", null);
+        } catch (Exception ex) {
+            AddLog($"Eroare pornire legătură: {ex.Message}", true);
         }
     }
 
-    private void SetMode(int mode)
+    private async Task SendCommand(string cmd)
     {
-        CurrentMode = mode;
-        AddLog($"Mod schimbat pe: Functionalitatea {mode}");
-
+        try {
+            await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/{cmd}", null);
+        } catch {
+            AddLog($"Eroare de rețea la transmiterea [{cmd}]", true);
+        }
     }
-  
+
+    private async Task SetMode(int mode)
+    {
+        AddLog($"Solicitare schimbare mod pe Funcționalitatea {mode}...");
+        await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/MODE_{mode}", null);
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender) _ = UpdateGraphLoop(_cts.Token);
@@ -293,43 +275,24 @@
             int currentLoad = (!IsAlarmActive && (Band1 || Band2)) ? rnd.Next(75, 100) : rnd.Next(0, 5);
             if (ChartData.Count >= 40) ChartData.Dequeue();
             ChartData.Enqueue(currentLoad);
-            
             await InvokeAsync(StateHasChanged);
             await Task.Delay(500, token);
-        }
-    }
-    private async Task SendCommand(string cmd)
-    {
-        AddLog($"Trimit comanda [{cmd}]...");
-        try 
-        {
-            await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/{cmd}", null);
-        } 
-        catch 
-        {
-            AddLog($"Eroare HTTP la comanda {cmd}", true);
         }
     }
 
     private void AddLog(string msg, bool isErr = false)
     {
         Logs.Insert(0, new LogEntry { Message = msg, IsError = isErr, Timestamp = DateTime.Now.ToString("HH:mm:ss") });
-        if (Logs.Count > 50) Logs.RemoveAt(50);
-        InvokeAsync(StateHasChanged);
+        if (Logs.Count > 30) Logs.RemoveAt(30);
     }
 
     public ValueTask DisposeAsync()
     {
-        _cts.Cancel();
-        _cts.Dispose();
+        _cts.Cancel(); _cts.Dispose();
         return ValueTask.CompletedTask;
     }
 
-    public class LogEntry { 
-        public string Message { get; set; } = ""; 
-        public string Timestamp { get; set; } = ""; 
-        public bool IsError { get; set; } 
-    }
+    public class LogEntry { public string Message { get; set; } = ""; public string Timestamp { get; set; } = ""; public bool IsError { get; set; } }
 
     public class StareSistem
     {
@@ -346,6 +309,7 @@
         public bool P2 { get; set; }
         public bool P3 { get; set; }
         public bool P4 { get; set; }
+        public int CurrentMode { get; set; }
         public bool IsAlarmActive { get; set; }
     }
 }
