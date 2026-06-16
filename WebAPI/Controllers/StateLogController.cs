@@ -19,7 +19,7 @@ namespace WebAPI.Controllers
 
         //POST api/statelog - save a new state change
         [HttpPost]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> LogState([FromBody] StateLogDto dto)
         {
             var username = User.FindFirstValue(ClaimTypes.Email) ?? "unknown";
@@ -27,7 +27,7 @@ namespace WebAPI.Controllers
             {
                 Timestamp = DateTime.UtcNow,
                 ChangedByUser = username,
-                StateJson = dto.StateJson,
+                StateJson = System.Text.Json.JsonSerializer.Serialize(dto.State),
                 ActionDescription = dto.ActionDescription,
                 AlarmActive = dto.AlarmActive
             };
@@ -40,7 +40,7 @@ namespace WebAPI.Controllers
 
         //GET api/statelog - get history of all state shanges
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetHistory()
         {
             var logs = await _db.StateLogs
@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
         }
 
         [HttpGet("alarms")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetAlarms()
         {
             var alarms = await _db.StateLogs
@@ -68,7 +68,7 @@ namespace WebAPI.Controllers
 
     public class StateLogDto
     {
-        public string StateJson { get; set; } = "{}";
+        public ConveyorSystemState State { get; set; } = new();
         public string ActionDescription { get; set; } = string.Empty;
         public bool AlarmActive { get; set; } = false;
     }

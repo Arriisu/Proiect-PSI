@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "1ri4X2lB1CU=",
+  "dgSpecHash": "tEly8oczvr8=",
   "success": true,
-  "projectFilePath": "/home/alex/Documents/GitHub/Proiect-PSI/Proiect-PSI/Simulator/Simulator/Simulator.csproj",
+  "projectFilePath": "C:\\Users\\User\\Documents\\GitHub\\Proiect-PSI\\Proiect-PSI\\Simulator\\Simulator\\Simulator.csproj",
   "expectedPackageFiles": [
-    "/home/alex/.nuget/packages/microsoft.aspnetcore.openapi/10.0.7/microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
-    "/home/alex/.nuget/packages/microsoft.openapi/2.0.0/microsoft.openapi.2.0.0.nupkg.sha512"
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.7\\microsoft.aspnetcore.openapi.10.0.7.nupkg.sha512",
+    "C:\\Users\\User\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
   ],
   "logs": []
 }
