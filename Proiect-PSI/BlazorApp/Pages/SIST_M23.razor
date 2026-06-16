@@ -207,25 +207,87 @@
     {
         if (firstRender)
         {
+<<<<<<< Updated upstream
             // Start the background loop for the real-time graph
             _ = UpdateGraphLoop(_cts.Token);
+=======
+            // Doar una poate rula
+            if (Band2) return; 
+            
+            // Doar dacă ieșirea corespunzătoare e pornită
+            if (FlapState == "S6" && Band3) Band1 = true;
+            if (FlapState == "S7" && (Band3 || Band4)) Band1 = true; 
+            if (FlapState == "S8" && Band4) Band1 = true;
+        }
+        else if (CurrentMode == 2)
+        {
+            // În modul 2, B1 poate fi pornită și simultan cu B2 dacă S7 permite și ieșirile rulează
+            if (FlapState == "S7")
+            {
+             if(Band3 && Band4) Band1 = true;
+             }
+            else if (FlapState == "S6" && Band3) Band1 = true;
+            else if (FlapState == "S8" && Band4) Band1 = true;
+>>>>>>> Stashed changes
         }
     }
 
     private async Task UpdateGraphLoop(CancellationToken token)
     {
+<<<<<<< Updated upstream
         var rnd = new Random();
         while (!token.IsCancellationRequested)
+=======
+        if (Band2) 
+        {
+             Band2 = false;
+             return; 
+        }
+        
+        if (CurrentMode == 1)
+>>>>>>> Stashed changes
         {
             // Calculate load based on running input motors
             int currentLoad = 0;
             if (SystemHealthy && (MotorStates["M1"] || MotorStates["M2"]))
             {
+<<<<<<< Updated upstream
                 currentLoad = rnd.Next(75, 100); // Running load
+=======
+                if (FlapState == "S6" && !Band3) Band1 = false;
+                if (FlapState == "S8" && !Band4) Band1 = false;
+                if (FlapState == "S7" && !Band3 && !Band4) Band1 = false;
             }
-            else
+            if (Band2)
             {
+                if (FlapState == "S6" && !Band4) Band2 = false;
+                if (FlapState == "S8" && !Band3) Band2 = false;
+                if (FlapState == "S7" && !Band3 && !Band4) Band2 = false;
+            }
+        }
+        else if (CurrentMode == 2)
+        {
+            if(FlapState =="S7")
+            if((Band1||Band2)&&(!Band3||!Band4))
+                S5_StopInputs();
+            if(FlapState =="S6")
+            {
+                if(Band1&&!Band3)
+                    Band1=false;
+                if(Band2&&!Band4)
+                    Band2=false;
+>>>>>>> Stashed changes
+            }
+            if(FlapState =="S8")
+            {
+<<<<<<< Updated upstream
                 currentLoad = rnd.Next(0, 5); // Idle noise
+=======
+                if(Band1&&!Band4)
+                    Band1=false;
+                if(Band2&&!Band3)
+                    Band2=false;
+>>>>>>> Stashed changes
             }
 
             if (ChartData.Count >= 40) ChartData.Dequeue();
