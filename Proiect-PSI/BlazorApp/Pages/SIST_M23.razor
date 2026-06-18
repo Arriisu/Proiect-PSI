@@ -202,11 +202,29 @@
     private List<LogEntry> Logs = new();
 
     private string _lastStateCache = "";
+    private String _jwtToken = "";
 
     protected override async Task OnInitializedAsync()
     {
         for (int i = 0; i < 40; i++) ChartData.Enqueue(0);
         AddLog("HMI Initialized. Se conectează la SignalR...");
+
+        // Login la WebAPI pentru a obtine token
+        try {
+            var loginData = new { email = "admin@conveyor.com", password = "Admin123!" };
+            var loginJson = System.Text.Json.JsonSerializer.Serialize(loginData);
+            var loginContent = new StringContent(loginJson, System.Text.Encoding.UTF8, "application/json");
+            var loginResponse = await Http.PostAsync("http://localhost:5138/api/Auth/login", loginContent);
+            if (loginResponse.IsSuccessStatusCode)
+            {
+                var result = await loginResponse.Content.ReadAsStringAsync();
+                var doc = System.Text.Json.JsonDocument.Parse(result);
+                _jwtToken = doc.RootElement.GetProperty("token").GetString() ?? "";
+                AddLog("Autentificat la WebAPI cu succes!");
+            }
+        } catch {
+            AddLog("WebAPI nu este disponibil - logging dezactivat", true);
+        }
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl("http://localhost:5168/m23hub")
@@ -251,11 +269,53 @@
     {
         try {
             await Http.PostAsync($"http://localhost:5168/api/ControllerSenzori/activare/{cmd}", null);
+
+            if (cmd =="ALARM" || cmd =="S0")
+            {
+                await Task.Delay(200);
+            }
+            await LogToWebAPI(cmd);
         } catch {
             AddLog($"Eroare de rețea la transmiterea [{cmd}]", true);
         }
     }
+    private async Task LogToWebAPI(string cmd)
+    {
+        try{
+            var stare = new {
+                state = new {
+                    s0 = false,
+                    s1 = Band1,
+                    s2 = Band2,
+                    s3 = Band3,
+                    s4 = Band4,
+                    s5 = false,
+                    s6 = FlapState == "S6",
+                    s7 = FlapState == "S7",
+                    s8 = FlapState == "S8",
+                    p1 = Band1,
+                    p2 = Band2,
+                    p3 = Band3,
+                    p4 = Band4,
+                    currentMode = CurrentMode,
+                    isAlarmActive = IsAlarmActive,
+                    mesajSistem = $"Comanda {cmd} trimisa"
+                    },
+                    actionDescription = $"Buton apasat: {cmd}",
+                    alarmActive = IsAlarmActive
+                };
+                var json = System.Text.Json.JsonSerializer.Serialize(stare);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
+                Http.DefaultRequestHeaders.Authorization = 
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _jwtToken);
+                await Http.PostAsync("http://localhost:5138/api/StateLog", content);
+            }
+            catch{
+                // Nu blocam UI-ul daca WebAPI-ul nu raspunde
+            }
+        }
+    
     private async Task SetMode(int mode)
     {
         AddLog($"Solicitare schimbare mod pe Funcționalitatea {mode}...");
