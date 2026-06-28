@@ -12,6 +12,17 @@ using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("PermiteBlazor", policy =>
+    {
+        policy.WithOrigins("http://localhost:5062", "https://localhost:7260")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    }
+ );
+});
+
 // Add Controllers
 builder.Services.AddControllers();
 
@@ -87,6 +98,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("PermiteBlazor");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
