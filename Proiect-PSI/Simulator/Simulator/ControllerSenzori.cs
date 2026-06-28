@@ -7,12 +7,18 @@ namespace Simulator
     public class ControllerSenzori : ControllerBase
     {
         private readonly StareSistem _stare;
+        private readonly DbLoggerService _dbLogger;
 
-        public ControllerSenzori(StareSistem stare) => _stare = stare;
+        public ControllerSenzori(StareSistem stare, DbLoggerService dbLogger)
+        {
+            _stare = stare;
+            _dbLogger = dbLogger;
+        }
 
         [HttpPost("activare/{numeSenzor}")]
-        public IActionResult ActivareSenzor(string numeSenzor)
+        public async Task<IActionResult> ActivareSenzor(string numeSenzor)
         {
+            string actiuneSistem = $"Apasare buton {numeSenzor}";   
             switch (numeSenzor)
             {
                 case "S1": _stare.ApasaStartBanda(1); break;
@@ -35,7 +41,10 @@ namespace Simulator
                     _stare.ElibereazaStopGeneralS0();
                     break;
             }
-            return Ok();
+
+            await _dbLogger.LogActionAsync(_stare, actiuneSistem);
+
+            return Ok($"Comanda pentru {numeSenzor} a fost procesata.");
         }
     }
 }

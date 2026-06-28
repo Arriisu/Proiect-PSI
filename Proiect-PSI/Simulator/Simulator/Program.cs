@@ -12,6 +12,9 @@ builder.Services.AddCors(options =>
               .AllowCredentials());
 });
 
+builder.Services.AddHttpClient(); 
+builder.Services.AddSingleton<DbLoggerService>();
+
 builder.Services.AddSingleton<StareSistem>();
 builder.Services.AddHostedService<LogicaM23>();
 
